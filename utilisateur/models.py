@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
 class PersonManager(BaseUserManager):
@@ -8,7 +8,8 @@ class PersonManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             nom=nom,
-            prenom=prenom
+            prenom=prenom,
+            # role=role
         )
         user.set_password(mot_de_passe)
         user.save(using=self._db)
@@ -20,6 +21,7 @@ class PersonManager(BaseUserManager):
             nom=nom,
             prenom=prenom,
             mot_de_passe=mot_de_passe,
+            #role='super_admin', 
         )
         user.is_admin = True
         user.save(using=self._db)
@@ -30,10 +32,15 @@ class Person(AbstractBaseUser):
     nom = models.CharField(max_length=255)
     prenom = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
+    username = models.CharField(unique=True)
     role = models.CharField(choices = ROLES,  default = 'user' )
-    EMAIL_FIELD = 'email'  # Utilisez l'email pour la connexion au lieu du username
-    USERNAME_FIELD = 'email'  # Désactiver 'username' pour utiliser uniquement l'email
+    
+    # is_active = models.BooleanField(default=True)
+    # is_staff = models.BooleanField(default=False)
 
+    EMAIL_FIELD = 'email'  # Utilisez l'email pour la connexion au lieu du username
+    USERNAME_FIELD = 'username'  # Désactiver 'username' pour utiliser uniquement l'email
+    # REQUIRED_FIELDS = ['nom', 'prenom']
 
 
 
